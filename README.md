@@ -12,7 +12,7 @@ EMBARGO analyzes source code and generates structured dependency graphs that lar
 
 - **Fast processing** - Analyze thousands of lines per second
 - **AI-ready output** - Compact format with inline function signatures
-- **Multi-language** - Supports 8+ programming languages
+- **Multi-language** - Supports 8+ programming languages.
 - **Parallel execution** - Efficient memory usage
 - **Zero config** - Automatic language detection
 
