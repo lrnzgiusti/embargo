@@ -1,0 +1,25 @@
+# Generated build artifacts
+/target/
+**/*.rs.bk
+
+# Workspace tooling
+.cargo/
+.idea/
+.vscode/
+/.fleet/
+
+# OS / editor cruft
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Logs & coverage
+*.log
+coverage/
+lcov.info
+
+# Temporary files
+tmp/
+**/__pycache__/
+eval/

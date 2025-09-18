@@ -1,0 +1,9 @@
+{
+  "database_url": "sqlite:///test.db",
+  "log_level": "DEBUG",
+  "max_users": "100",
+  "enable_encryption": "true",
+  "simulate_error": "false",
+  "app_version": "@PROJECT_VERSION@",
+  "build_type": "@CMAKE_BUILD_TYPE@"
+}
