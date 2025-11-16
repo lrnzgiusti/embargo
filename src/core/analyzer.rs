@@ -25,13 +25,13 @@ impl CodebaseAnalyzer {
     }
 
     pub fn analyze(&mut self, root_path: &Path, languages: &[&str]) -> Result<DependencyGraph> {
-        println!("🔍 Scanning files...");
+        println!("Scanning files...");
         let files = self.file_scanner.scan_directory(root_path, languages)?;
-        println!("📊 Found {} files to analyze", files.len());
+        println!("Found {} files to analyze", files.len());
 
         let mut graph_builder = super::graph::GraphBuilder::new();
 
-        println!("⚡ Parsing files with cache optimization...");
+        println!("Parsing files with cache optimization...");
 
         // Check which files need reparsing
         let mut cached_count = 0;
@@ -90,12 +90,12 @@ impl CodebaseAnalyzer {
         }
 
         println!(
-            "📋 Cache hits: {}, Parsed: {}",
+            "Cache hits: {}, Parsed: {}",
             cached_count,
             parse_results.len() - cached_count
         );
 
-        println!("🏗️  Building dependency graph...");
+        println!("Building dependency graph...");
 
         // Pre-calculate total capacity to avoid reallocations
         let total_nodes: usize = parse_results.iter().map(|r| r.nodes.len()).sum();
@@ -124,7 +124,7 @@ impl CodebaseAnalyzer {
             }
         }
 
-        println!("🔗 Resolving function calls...");
+        println!("Resolving function calls...");
 
         // Build function resolution index using optimized parallel processing
         let mut resolver = self.function_resolver.clone();
@@ -139,9 +139,9 @@ impl CodebaseAnalyzer {
                     added += 1;
                 }
             }
-            println!("🔗 Resolved {} call edges", added);
+            println!("Resolved {} call edges", added);
         } else {
-            println!("✅ No call sites detected; skipping call resolution");
+            println!("No call sites detected; skipping call resolution");
         }
 
         Ok(graph_builder.build())

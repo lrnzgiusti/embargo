@@ -14,7 +14,7 @@ use crate::core::CodebaseAnalyzer;
     name = "embargo",
     version = "0.1.0",
     author = "embargo developers",
-    about = "⚡ ULTRAFAST codebase dependency extractor - Sub-1s analysis"
+    about = "Ultrafast codebase dependency extractor - Sub-1s analysis"
 )]
 struct Cli {
     /// Input directory to analyze
@@ -80,11 +80,11 @@ fn run(cli: Cli) -> Result<()> {
         .collect();
     let language_refs: Vec<&str> = normalized_languages.iter().map(String::as_str).collect();
 
-    println!("🚀 EMBARGO - Ultrafast Codebase Analysis");
-    println!("📁 Input: {} (targeting <1s)", input.display());
-    println!("📄 Output: {}", output.display());
-    println!("🎨 Format: {}", format.as_str());
-    println!("🔧 Languages: {:?}", normalized_languages);
+    println!("EMBARGO - Ultrafast Codebase Analysis");
+    println!("Input: {} (targeting <1s)", input.display());
+    println!("Output: {}", output.display());
+    println!("Format: {}", format.as_str());
+    println!("Languages: {:?}", normalized_languages);
 
     let analysis_start = Instant::now();
 
@@ -93,7 +93,7 @@ fn run(cli: Cli) -> Result<()> {
 
     let analysis_time = analysis_start.elapsed();
     println!(
-        "⚡ Analysis completed in {:.2}s",
+        "Analysis completed in {:.2}s",
         analysis_time.as_secs_f64()
     );
 
@@ -120,22 +120,22 @@ fn run(cli: Cli) -> Result<()> {
             let formatter = JsonCompactFormatter::new();
             generated_output = output.with_extension("json");
             formatter.format_to_file(&dependency_graph, &generated_output)?;
-            println!("📄 JSON output: {}", generated_output.display());
+            println!("JSON output: {}", generated_output.display());
         }
     }
 
     let total_time = start_time.elapsed();
     println!(
-        "✅ Analysis complete! Generated {}",
+        "Analysis complete. Generated {}",
         generated_output.display()
     );
-    println!("⏱️  Total execution time: {:.2}s", total_time.as_secs_f64());
+    println!("Total execution time: {:.2}s", total_time.as_secs_f64());
 
     if total_time.as_secs_f64() < 1.0 {
-        println!("🎯 ULTRAFAST TARGET ACHIEVED! Sub-1 second execution ⚡");
+        println!("Sub-1 second execution achieved.");
     } else {
         println!(
-            "📊 Execution time: {:.2}s (optimizations in progress)",
+            "Execution time: {:.2}s (optimizations in progress)",
             total_time.as_secs_f64()
         );
     }

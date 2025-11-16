@@ -60,7 +60,7 @@ impl EmbargoFormatter {
         }
 
         if !modules.is_empty() {
-            output.push_str("## 📦 Modules & Imports\n\n");
+            output.push_str("## Modules & Imports\n\n");
             for (idx, module) in modules {
                 output.push_str(&self.format_module_node(module, idx, graph));
             }
@@ -68,7 +68,7 @@ impl EmbargoFormatter {
         }
 
         if !classes.is_empty() {
-            output.push_str("## 🏛️ Classes\n\n");
+            output.push_str("## Classes\n\n");
             for (idx, class) in classes {
                 output.push_str(&self.format_class_node(class, idx, graph));
             }
@@ -76,7 +76,7 @@ impl EmbargoFormatter {
         }
 
         if !interfaces.is_empty() {
-            output.push_str("## 🔌 Interfaces\n\n");
+            output.push_str("## Interfaces\n\n");
             for (idx, interface) in interfaces {
                 output.push_str(&self.format_interface_node(interface, idx, graph));
             }
@@ -84,7 +84,7 @@ impl EmbargoFormatter {
         }
 
         if !functions.is_empty() {
-            output.push_str("## ⚡ Functions\n\n");
+            output.push_str("## Functions\n\n");
             for (idx, function) in functions {
                 output.push_str(&self.format_function_node(function, idx, graph));
             }
@@ -92,14 +92,14 @@ impl EmbargoFormatter {
         }
 
         if !variables.is_empty() {
-            output.push_str("## 📊 Variables\n\n");
+            output.push_str("## Variables\n\n");
             for (idx, variable) in variables {
                 output.push_str(&self.format_variable_node(variable, idx, graph));
             }
             output.push_str("\n---\n\n");
         }
 
-        output.push_str("## 🕸️ Dependency Graph Summary\n\n");
+        output.push_str("## Dependency Graph Summary\n\n");
         output.push_str("### Edge Types\n\n");
 
         let mut edge_counts = HashMap::new();
@@ -131,7 +131,7 @@ impl EmbargoFormatter {
 
     fn format_module_node(&self, node: &Node, idx: NodeIndex, graph: &DependencyGraph) -> String {
         let mut output = String::new();
-        output.push_str(&format!("### 📦 {}\n\n", node.name));
+        output.push_str(&format!("### {}\n\n", node.name));
         output.push_str(&format!("- **ID**: `{}`\n", node.id));
         output.push_str(&format!("- **File**: `{}`\n", node.file_path.display()));
         output.push_str(&format!("- **Line**: {}\n", node.line_number));
@@ -151,7 +151,7 @@ impl EmbargoFormatter {
 
     fn format_class_node(&self, node: &Node, idx: NodeIndex, graph: &DependencyGraph) -> String {
         let mut output = String::new();
-        output.push_str(&format!("### 🏛️ {}\n\n", node.name));
+        output.push_str(&format!("### {}\n\n", node.name));
         output.push_str(&format!("- **ID**: `{}`\n", node.id));
         output.push_str(&format!("- **File**: `{}`\n", node.file_path.display()));
         output.push_str(&format!("- **Line**: {}\n", node.line_number));
@@ -202,7 +202,7 @@ impl EmbargoFormatter {
         graph: &DependencyGraph,
     ) -> String {
         let mut output = String::new();
-        output.push_str(&format!("### 🔌 {}\n\n", node.name));
+        output.push_str(&format!("### {}\n\n", node.name));
         output.push_str(&format!("- **ID**: `{}`\n", node.id));
         output.push_str(&format!("- **File**: `{}`\n", node.file_path.display()));
         output.push_str(&format!("- **Line**: {}\n", node.line_number));
@@ -224,7 +224,7 @@ impl EmbargoFormatter {
 
     fn format_function_node(&self, node: &Node, idx: NodeIndex, graph: &DependencyGraph) -> String {
         let mut output = String::new();
-        output.push_str(&format!("### ⚡ {}\n\n", node.name));
+        output.push_str(&format!("### {}\n\n", node.name));
         output.push_str(&format!("- **ID**: `{}`\n", node.id));
         output.push_str(&format!("- **File**: `{}`\n", node.file_path.display()));
         output.push_str(&format!("- **Line**: {}\n", node.line_number));
@@ -266,7 +266,7 @@ impl EmbargoFormatter {
         _graph: &DependencyGraph,
     ) -> String {
         let mut output = String::new();
-        output.push_str(&format!("### 📊 {}\n\n", node.name));
+        output.push_str(&format!("### {}\n\n", node.name));
         output.push_str(&format!("- **ID**: `{}`\n", node.id));
         output.push_str(&format!("- **File**: `{}`\n", node.file_path.display()));
         output.push_str(&format!("- **Line**: {}\n", node.line_number));
