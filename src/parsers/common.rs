@@ -65,6 +65,11 @@ pub fn generate_node_id(file_path: &Path, node_type: &str, name: &str, line: usi
 }
 
 pub fn extract_docstring(node: &TSNode, source: &[u8]) -> Option<String> {
+    // For Python, docstrings can be:
+    // 1. Direct child of function_definition (for functions)
+    // 2. Inside the "block" child (for classes and functions in some cases)
+    
+    // First try direct children
     for child in node.children(&mut node.walk()) {
         if child.kind() == "expression_statement" {
             if let Some(string_node) = child.child(0) {
@@ -77,6 +82,33 @@ pub fn extract_docstring(node: &TSNode, source: &[u8]) -> Option<String> {
                                 .to_string(),
                         );
                     }
+                }
+            }
+        }
+        
+        // Check inside block (for classes)
+        if child.kind() == "block" {
+            // Look for expression_statement as first non-comment statement
+            for block_child in child.children(&mut child.walk()) {
+                if block_child.kind() == "expression_statement" {
+                    if let Some(string_node) = block_child.child(0) {
+                        if string_node.kind() == "string" {
+                            let docstring = extract_text(&string_node, source);
+                            if docstring.starts_with("\"\"\"") || docstring.starts_with("'''") {
+                                return Some(
+                                    docstring
+                                        .trim_matches(|c| c == '"' || c == '\'')
+                                        .to_string(),
+                                );
+                            }
+                        }
+                    }
+                    // Only check first expression_statement
+                    break;
+                } else if block_child.kind() != "comment" && block_child.kind() != "pass_statement" {
+                    // If we hit something other than comment or pass before finding docstring, stop
+                    // (docstrings must be first)
+                    break;
                 }
             }
         }

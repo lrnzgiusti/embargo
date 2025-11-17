@@ -820,6 +820,41 @@ impl CallSiteExtractor {
                 // Simple function call: func()
                 self.extract_text(function_node, source).to_string()
             }
+            "attribute" => {
+                // Python attribute access: obj.method() or self.method() or super().method()
+                // Extract the method name (rightmost identifier)
+                let full_text = self.extract_text(function_node, source);
+                
+                // Handle special cases
+                if full_text.starts_with("self.") {
+                    // self.method() - extract method name
+                    return full_text[5..].to_string();
+                }
+                if full_text.starts_with("cls.") {
+                    // cls.method() - class method call
+                    return full_text[4..].to_string();
+                }
+                if full_text.starts_with("super().") {
+                    // super().method() - parent method call
+                    return full_text[8..].to_string();
+                }
+                
+                // For other attribute access like module.func or obj.method
+                // Look for the attribute identifier
+                let mut cursor = function_node.walk();
+                for child in function_node.children(&mut cursor) {
+                    if child.kind() == "identifier" && child.start_byte() > function_node.start_byte() {
+                        // This is the attribute name (not the object)
+                        let attr = self.extract_text(&child, source);
+                        if !attr.is_empty() {
+                            return attr.to_string();
+                        }
+                    }
+                }
+                
+                // Fallback: return the full attribute chain
+                full_text.to_string()
+            }
             "field_expression" => {
                 // Member function call: obj.method() (Rust, C++, JS)
                 // Extract the method name (rightmost part)
@@ -851,6 +886,19 @@ impl CallSiteExtractor {
                 // Function pointer calls: func_ptr()
                 self.extract_text(function_node, source).to_string()
             }
+            "call" => {
+                // Nested call: super().method() where super() is itself a call
+                // This handles patterns like super().__init__()
+                let full_text = self.extract_text(function_node, source);
+                if full_text.contains("super()") {
+                    return full_text.to_string();
+                }
+                // For other nested calls, extract the outer function
+                if let Some(inner) = function_node.child(0) {
+                    return self.extract_function_name_from_node(&inner, source);
+                }
+                full_text.to_string()
+            }
             _ => {
                 // Fallback: extract full text
                 self.extract_text(function_node, source).to_string()
@@ -864,11 +912,30 @@ impl CallSiteExtractor {
         function_node: &tree_sitter::Node,
     ) -> CallType {
         match function_node.kind() {
+            "attribute" => {
+                // Python attribute access
+                if called_name.starts_with("self.") || called_name.starts_with("cls.") {
+                    CallType::MethodCall
+                } else if called_name.starts_with("super()") || called_name.contains("super()") {
+                    CallType::MethodCall
+                } else if called_name.contains('.') {
+                    CallType::QualifiedCall // module.function style
+                } else {
+                    CallType::MethodCall
+                }
+            }
             "field_expression" => CallType::MethodCall, // obj.method()
             "qualified_identifier" => CallType::QualifiedCall, // namespace::func() or Class::method()
             "scoped_identifier" => CallType::QualifiedCall, // Rust std::println, crate::module::function
             "generic_function" => CallType::QualifiedCall,  // Rust Vec::<i32>::new()
             "identifier" => {
+                // Check if it looks like a class instantiation (PascalCase)
+                if !called_name.is_empty() {
+                    let first_char = called_name.chars().next().unwrap();
+                    if first_char.is_uppercase() && !called_name.contains('_') {
+                        return CallType::ConstructorCall;
+                    }
+                }
                 if called_name.contains("::") {
                     CallType::QualifiedCall // C++/Rust scope resolution
                 } else if called_name.contains('.') {
@@ -877,8 +944,15 @@ impl CallSiteExtractor {
                     CallType::SimpleCall // Simple function call
                 }
             }
-            "attribute" => CallType::MethodCall, // Python attribute access
-            _ => CallType::DynamicCall,          // Function pointers, etc.
+            "call" => {
+                // Nested call like super().__init__()
+                if called_name.contains("super()") {
+                    CallType::MethodCall
+                } else {
+                    CallType::DynamicCall
+                }
+            }
+            _ => CallType::DynamicCall, // Function pointers, etc.
         }
     }
 
