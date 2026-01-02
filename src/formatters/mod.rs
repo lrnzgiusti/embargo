@@ -13,7 +13,7 @@ mod llm_optimized;
 
 pub use json_compact::JsonCompactFormatter;
 pub use llm_language::{LlmLanguageAdapter, PythonLanguageAdapter};
-pub use llm_optimized::LLMOptimizedFormatter;
+pub use llm_optimized::{LLMOptimizedFormatter, OutputVerbosity};
 
 pub struct EmbargoFormatter;
 

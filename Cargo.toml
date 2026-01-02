@@ -3,8 +3,11 @@ name = "embargo"
 version = "0.1.0"
 edition = "2021"
 authors = ["embargo developers"]
-description = "Ultrafast codebase dependency extractor and formatter"
-license = "MIT"
+description = "Fast codebase dependency extraction for AI code analysis"
+license = "Apache-2.0"
+keywords = ["dependency", "analysis", "llm", "code-analysis", "ast"]
+categories = ["development-tools", "command-line-utilities"]
+readme = "README.md"
 
 [[bin]]
 name = "embargo"

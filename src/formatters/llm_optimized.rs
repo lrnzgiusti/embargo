@@ -1,3 +1,20 @@
+//! LLM-optimized output formatter.
+//!
+//! Generates compact, token-efficient dependency graphs with semantic clustering
+//! and behavioral notation designed for AI code analysis.
+//!
+//! ## Output Structure
+//!
+//! - **DIRECTORY_TREE**: Hierarchical file organization with semantic prefixes
+//! - **ARCHITECTURAL_CLUSTERS**: Code grouped by functional purpose
+//! - **DEPENDENCY_PATTERNS**: Cross-module relationship analysis
+//!
+//! ## Behavioral Notation
+//!
+//! - `function()[ENTRY]` - Public API entry point
+//! - `function()[HOT]` - Performance-critical function
+//! - `function()->{calls}` - Immediate function calls
+
 use anyhow::Result;
 use petgraph::graph::NodeIndex;
 use petgraph::visit::EdgeRef;
@@ -8,7 +25,19 @@ use std::path::Path;
 use super::llm_language::{DefaultLanguageAdapter, LlmLanguageAdapter};
 use crate::core::{DependencyGraph, Edge, Node, NodeType};
 
-/// LLM-optimized formatter that minimizes tokens while maximizing structural understanding
+/// Output verbosity level for LLM-optimized format.
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Default)]
+pub enum OutputVerbosity {
+    /// Compact core only - minimal tokens, no interpretation key
+    Compact,
+    /// Core + interpretation key (default)
+    #[default]
+    Standard,
+    /// Full output with all sections including dependency patterns
+    Verbose,
+}
+
+/// LLM-optimized formatter that minimizes tokens while maximizing structural understanding.
 pub struct LLMOptimizedFormatter {
     /// Whether to include detailed metadata (false for token efficiency)
     include_metadata: bool,
@@ -22,18 +51,28 @@ pub struct LLMOptimizedFormatter {
     use_advanced_dag: bool,
     /// Language-specific adapter for formatting semantics
     language_adapter: Box<dyn LlmLanguageAdapter>,
+    /// Output verbosity level
+    verbosity: OutputVerbosity,
 }
 
 impl LLMOptimizedFormatter {
+    /// Creates a new formatter with default settings.
     pub fn new() -> Self {
         Self {
-            include_metadata: true, // Enable signatures by default
+            include_metadata: true,
             use_hierarchical: true,
             compress_ids: true,
             use_semantic_clustering: true,
             use_advanced_dag: true,
             language_adapter: Box::new(DefaultLanguageAdapter::new()),
+            verbosity: OutputVerbosity::default(),
         }
+    }
+
+    /// Sets the output verbosity level.
+    pub fn with_verbosity(mut self, verbosity: OutputVerbosity) -> Self {
+        self.verbosity = verbosity;
+        self
     }
 
     #[allow(dead_code)]
@@ -83,10 +122,12 @@ impl LLMOptimizedFormatter {
     }
 
     fn format_graph(&self, graph: &DependencyGraph) -> Result<String> {
-        let mut output = String::with_capacity(8192); // Pre-allocate reasonable size
+        let mut output = String::with_capacity(8192);
 
-        // LLM System Prompt and Interpretation Key
-        self.add_interpretation_key(&mut output);
+        // Interpretation key only for Standard and Verbose modes
+        if self.verbosity != OutputVerbosity::Compact {
+            self.add_interpretation_key(&mut output);
+        }
 
         // Compact header
         output.push_str("# CODE_GRAPH\n");
@@ -123,12 +164,14 @@ impl LLMOptimizedFormatter {
             self.format_flat(&mut output, &by_type, &file_map, graph)?;
         }
 
-        // Advanced dependency analysis
-        if self.use_advanced_dag {
-            output.push('\n');
-            self.format_advanced_dependencies(&mut output, graph, &semantic_clusters);
-        } else {
-            self.format_dependency_summary(&mut output, graph);
+        // Dependency patterns only for Verbose mode
+        if self.verbosity == OutputVerbosity::Verbose {
+            if self.use_advanced_dag {
+                output.push('\n');
+                self.format_advanced_dependencies(&mut output, graph, &semantic_clusters);
+            } else {
+                self.format_dependency_summary(&mut output, graph);
+            }
         }
 
         Ok(output)

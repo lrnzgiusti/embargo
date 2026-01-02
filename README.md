@@ -86,65 +86,62 @@ cache.rs→[get((&self, file_path: &Path))[HOT]→{load_from_disk,store_to_disk}
 Fast analysis through parallel processing and efficient parsing:
 
 
-```bash
-~/embargo$ ./target/release/embargo -i src/ -o ./embargo_compact.md -l rust -f json-compact
-🚀 EMBARGO - Ultrafast Codebase Analysis
-📁 Input: src/ (targeting <1s)
-📄 Output: ./embargo_compact.md
-🎨 Format: json-compact
-🔧 Languages: ["rust"]
-🔍 Scanning files...
-📊 Found 21 files to analyze
-⚡ Parsing files with cache optimization...
-📋 Cache hits: 21, Parsed: 0
-🏗️  Building dependency graph...
-🔗 Resolving function calls...
-✅ Skipped call resolution for maximum performance
-⚡ Analysis completed in 0.01s
-📄 JSON output: ./embargo_compact.json
-✅ Analysis complete! Generated ./embargo_compact.md
-⏱️  Total execution time: 0.01s
-🎯 ULTRAFAST TARGET ACHIEVED! Sub-1 second execution ⚡
+```
+$ embargo -i src/ -o ./embargo_compact.md -l rust -f json-compact
+EMBARGO - Codebase Analysis
+Input: src/
+Output: ./embargo_compact.md
+Format: json-compact
+Languages: ["rust"]
+Scanning files...
+Found 21 files to analyze
+Parsing files with cache optimization...
+Cache hits: 21, Parsed: 0
+Building dependency graph...
+Resolving function calls...
+Skipped call resolution for maximum performance
+Analysis completed in 0.01s
+JSON output: ./embargo_compact.json
+Analysis complete! Generated ./embargo_compact.md
+Total execution time: 0.01s
 ```
 
-```bash
-~/embargo$ ./target/release/embargo -i src/ -o ./embargo.md -l rust -f markdown
-🚀 EMBARGO - Ultrafast Codebase Analysis
-📁 Input: src/ (targeting <1s)
-📄 Output: ./embargo.md
-🎨 Format: markdown
-🔧 Languages: ["rust"]
-🔍 Scanning files...
-📊 Found 21 files to analyze
-⚡ Parsing files with cache optimization...
-📋 Cache hits: 21, Parsed: 0
-🏗️  Building dependency graph...
-🔗 Resolving function calls...
-✅ Skipped call resolution for maximum performance
-⚡ Analysis completed in 0.01s
-✅ Analysis complete! Generated ./embargo.md
-⏱️  Total execution time: 0.01s
-🎯 ULTRAFAST TARGET ACHIEVED! Sub-1 second execution ⚡
+```
+$ embargo -i src/ -o ./embargo.md -l rust -f markdown
+EMBARGO - Codebase Analysis
+Input: src/
+Output: ./embargo.md
+Format: markdown
+Languages: ["rust"]
+Scanning files...
+Found 21 files to analyze
+Parsing files with cache optimization...
+Cache hits: 21, Parsed: 0
+Building dependency graph...
+Resolving function calls...
+Skipped call resolution for maximum performance
+Analysis completed in 0.01s
+Analysis complete! Generated ./embargo.md
+Total execution time: 0.01s
 ```
 
-```bash
-~/embargo$ ./target/debug/embargo -i src/ -o ./embargo_llm_opt.md -l rust -f llm-optimized
-🚀 EMBARGO - Ultrafast Codebase Analysis
-📁 Input: src/ (targeting <1s)
-📄 Output: ./embargo_llm_opt.md
-🎨 Format: llm-optimized
-🔧 Languages: ["rust"]
-🔍 Scanning files...
-📊 Found 21 files to analyze
-⚡ Parsing files with cache optimization...
-📋 Cache hits: 21, Parsed: 0
-🏗️  Building dependency graph...
-🔗 Resolving function calls...
-✅ Skipped call resolution for maximum performance
-⚡ Analysis completed in 0.02s
-✅ Analysis complete! Generated ./embargo_llm_opt.md
-⏱️  Total execution time: 0.04s
-🎯 ULTRAFAST TARGET ACHIEVED! Sub-1 second execution ⚡
+```
+$ embargo -i src/ -o ./embargo_llm_opt.md -l rust -f llm-optimized
+EMBARGO - Codebase Analysis
+Input: src/
+Output: ./embargo_llm_opt.md
+Format: llm-optimized
+Languages: ["rust"]
+Scanning files...
+Found 21 files to analyze
+Parsing files with cache optimization...
+Cache hits: 21, Parsed: 0
+Building dependency graph...
+Resolving function calls...
+Skipped call resolution for maximum performance
+Analysis completed in 0.02s
+Analysis complete! Generated ./embargo_llm_opt.md
+Total execution time: 0.04s
 ```
 ## Supported Languages
 

@@ -1,5 +1,5 @@
 use embargo::core::graph::{Edge, EdgeType, GraphBuilder, Node, NodeType};
-use embargo::formatters::LLMOptimizedFormatter;
+use embargo::formatters::{LLMOptimizedFormatter, OutputVerbosity};
 use std::path::PathBuf;
 
 fn func(path: &str, id: &str, name: &str, line: usize, public: bool) -> Node {
@@ -52,6 +52,7 @@ fn llm_clusters_large_graph_matches_golden() {
     let tmp = tempfile::NamedTempFile::new().unwrap();
     let path = tmp.path().to_path_buf();
     LLMOptimizedFormatter::new()
+        .with_verbosity(OutputVerbosity::Verbose)
         .format_to_file(&graph, &path)
         .unwrap();
     let out = std::fs::read_to_string(&path).unwrap();

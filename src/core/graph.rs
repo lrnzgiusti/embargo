@@ -1,49 +1,83 @@
+//! Dependency graph data structures.
+//!
+//! This module defines the core types for representing code entities and their relationships.
+
 use petgraph::{graph::NodeIndex, Directed, Graph};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 use std::path::PathBuf;
 
+/// Type of code entity in the dependency graph.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Copy)]
 pub enum NodeType {
+    /// Module or file-level import
     Module,
+    /// Class or struct definition
     Class,
+    /// Function or method definition
     Function,
+    /// Variable or constant declaration
     Variable,
+    /// Interface or trait definition
     Interface,
+    /// Enum type definition
     Enum,
 }
 
+/// Type of relationship between code entities.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq, Eq, Hash, Copy)]
 pub enum EdgeType {
+    /// Module import relationship
     Import,
+    /// Function call relationship
     Call,
+    /// Class inheritance relationship
     Inheritance,
+    /// Interface implementation
     Implements,
+    /// General usage relationship
     Uses,
+    /// Containment (e.g., class contains method)
     Contains,
 }
 
+/// A node representing a code entity in the dependency graph.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Node {
+    /// Unique identifier: `filepath:type:name:line`
     pub id: String,
+    /// Entity name
     pub name: String,
+    /// Entity type
     pub node_type: NodeType,
+    /// Source file path
     pub file_path: PathBuf,
+    /// Line number where entity is defined
     pub line_number: usize,
+    /// Programming language
     pub language: String,
+    /// Function/method signature with parameters and types
     pub signature: Option<String>,
+    /// Documentation string
     pub docstring: Option<String>,
+    /// Visibility modifier (public, private, etc.)
     pub visibility: Option<String>,
 }
 
+/// An edge representing a relationship between two code entities.
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Edge {
+    /// Type of relationship
     pub edge_type: EdgeType,
+    /// Source node identifier
     pub source_id: String,
+    /// Target node identifier
     pub target_id: String,
+    /// Additional context about the relationship
     pub context: Option<String>,
 }
 
+/// Directed graph of code dependencies using petgraph.
 pub type DependencyGraph = Graph<Node, Edge, Directed>;
 
 impl Node {
@@ -100,12 +134,14 @@ impl Edge {
     }
 }
 
+/// Builder for constructing dependency graphs incrementally.
 pub struct GraphBuilder {
     graph: DependencyGraph,
     node_map: HashMap<String, NodeIndex>,
 }
 
 impl GraphBuilder {
+    /// Creates a new empty graph builder.
     pub fn new() -> Self {
         Self {
             graph: Graph::new(),

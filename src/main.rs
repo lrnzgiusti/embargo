@@ -38,6 +38,10 @@ struct Cli {
     /// Output format: markdown, llm-optimized, json-compact
     #[arg(short, long, value_name = "FORMAT", value_enum, default_value_t = OutputFormat::LlmOptimized)]
     format: OutputFormat,
+
+    /// Output verbosity for llm-optimized format: compact, standard, verbose
+    #[arg(long, value_name = "LEVEL", value_enum, default_value_t = Verbosity::Standard)]
+    verbosity: Verbosity,
 }
 
 #[derive(Debug, Copy, Clone, Eq, PartialEq, ValueEnum)]
@@ -46,6 +50,19 @@ enum OutputFormat {
     Markdown,
     LlmOptimized,
     JsonCompact,
+}
+
+/// Output verbosity level for llm-optimized format.
+#[derive(Debug, Copy, Clone, Eq, PartialEq, ValueEnum, Default)]
+#[value(rename_all = "kebab-case")]
+enum Verbosity {
+    /// Minimal tokens, no interpretation key
+    Compact,
+    /// Core + interpretation key (default)
+    #[default]
+    Standard,
+    /// Full output with dependency patterns
+    Verbose,
 }
 
 impl OutputFormat {
@@ -69,6 +86,7 @@ fn run(cli: Cli) -> Result<()> {
         output,
         languages,
         format,
+        verbosity,
     } = cli;
 
     let start_time = Instant::now();
@@ -105,12 +123,18 @@ fn run(cli: Cli) -> Result<()> {
             EmbargoFormatter::new().format_to_file(&dependency_graph, &output)?;
         }
         OutputFormat::LlmOptimized => {
-            use crate::formatters::LLMOptimizedFormatter;
+            use crate::formatters::{LLMOptimizedFormatter, OutputVerbosity};
+            let output_verbosity = match verbosity {
+                Verbosity::Compact => OutputVerbosity::Compact,
+                Verbosity::Standard => OutputVerbosity::Standard,
+                Verbosity::Verbose => OutputVerbosity::Verbose,
+            };
             let formatter = if language_refs.iter().any(|lang| *lang == "python") {
                 LLMOptimizedFormatter::for_python()
             } else {
                 LLMOptimizedFormatter::new()
             }
+            .with_verbosity(output_verbosity)
             .with_hierarchical(true)
             .with_compressed_ids(true);
             formatter.format_to_file(&dependency_graph, &output)?;

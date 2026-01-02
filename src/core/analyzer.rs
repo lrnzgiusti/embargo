@@ -1,9 +1,17 @@
+//! Codebase analysis orchestrator.
+//!
+//! Coordinates file scanning, parsing, and dependency graph construction.
+
 use anyhow::Result;
 use std::path::Path;
 
 use super::{DependencyGraph, FileScanner, FunctionResolver};
 use crate::parsers::{cache::ParseCache, ParserFactory};
 
+/// Main orchestrator for codebase analysis.
+///
+/// Coordinates file scanning, parsing across multiple languages, and
+/// dependency graph construction with caching optimization.
 pub struct CodebaseAnalyzer {
     file_scanner: FileScanner,
     parser_factory: ParserFactory,
@@ -12,6 +20,7 @@ pub struct CodebaseAnalyzer {
 }
 
 impl CodebaseAnalyzer {
+    /// Creates a new analyzer with default configuration.
     pub fn new() -> Self {
         Self {
             file_scanner: FileScanner::new(),
@@ -24,6 +33,10 @@ impl CodebaseAnalyzer {
         }
     }
 
+    /// Analyzes a codebase and builds a dependency graph.
+    ///
+    /// Scans the directory for source files, parses them using language-specific
+    /// parsers, and constructs a graph of code entities and their relationships.
     pub fn analyze(&mut self, root_path: &Path, languages: &[&str]) -> Result<DependencyGraph> {
         println!("Scanning files...");
         let files = self.file_scanner.scan_directory(root_path, languages)?;

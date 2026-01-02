@@ -1,5 +1,5 @@
 use embargo::core::graph::{Edge, EdgeType, GraphBuilder, Node, NodeType};
-use embargo::formatters::LLMOptimizedFormatter;
+use embargo::formatters::{LLMOptimizedFormatter, OutputVerbosity};
 use std::path::PathBuf;
 
 fn node(id: &str, name: &str, ty: NodeType) -> Node {
@@ -26,7 +26,8 @@ fn llm_optimized_contains_headers_and_counts() {
     let tmp = tempfile::NamedTempFile::new().unwrap();
     let path = tmp.path().to_path_buf();
 
-    let fmt = LLMOptimizedFormatter::new();
+    // Use verbose mode to include all sections
+    let fmt = LLMOptimizedFormatter::new().with_verbosity(OutputVerbosity::Verbose);
     fmt.format_to_file(&graph, &path).unwrap();
     let s = std::fs::read_to_string(&path).unwrap();
 
@@ -36,4 +37,24 @@ fn llm_optimized_contains_headers_and_counts() {
     assert!(s.contains("## DIRECTORY_TREE"));
     assert!(s.contains("## ARCHITECTURAL_CLUSTERS"));
     assert!(s.contains("## DEPENDENCY_PATTERNS"));
+}
+
+#[test]
+fn llm_optimized_compact_mode_excludes_extras() {
+    let mut gb = GraphBuilder::new();
+    let f = node("F", "foo", NodeType::Function);
+    gb.add_node(f);
+    let graph = gb.build();
+
+    let tmp = tempfile::NamedTempFile::new().unwrap();
+    let path = tmp.path().to_path_buf();
+
+    let fmt = LLMOptimizedFormatter::new().with_verbosity(OutputVerbosity::Compact);
+    fmt.format_to_file(&graph, &path).unwrap();
+    let s = std::fs::read_to_string(&path).unwrap();
+
+    // Compact mode excludes interpretation key and dependency patterns
+    assert!(!s.contains("# EMBARGO: LLM-Optimized"));
+    assert!(!s.contains("## DEPENDENCY_PATTERNS"));
+    assert!(s.contains("# CODE_GRAPH"));
 }

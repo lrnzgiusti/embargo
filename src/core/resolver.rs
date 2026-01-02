@@ -1,3 +1,7 @@
+//! Function call resolution.
+//!
+//! Maps function calls to their definitions using hash-based O(1) lookup.
+
 use anyhow::Result;
 use rayon::prelude::*;
 use std::collections::HashMap;
@@ -5,7 +9,10 @@ use std::path::{Path, PathBuf};
 
 use crate::core::{Edge, EdgeType, Node, NodeType};
 
-/// Fast hash-based function call resolver that maps function calls to their definitions
+/// Fast hash-based function call resolver.
+///
+/// Uses O(1) hash lookup for function name resolution with method
+/// and qualified name support.
 #[derive(Debug, Clone)]
 pub struct FunctionResolver {
     /// Hash map for O(1) function name lookup
@@ -49,24 +56,37 @@ pub struct MethodEntry {
     pub signature: Option<String>,
 }
 
+/// A function call site extracted from source code.
 #[derive(Debug, Clone, serde::Serialize, serde::Deserialize)]
 pub struct CallSite {
+    /// ID of the calling function
     pub caller_id: String,
+    /// Name of the called function
     pub called_name: String,
+    /// Type of call
     pub call_type: CallType,
+    /// Additional context (e.g., class name for method calls)
     pub context: Option<String>,
+    /// Line number of the call
     pub line_number: usize,
 }
 
+/// Type of function call.
 #[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
 pub enum CallType {
-    SimpleCall,    // function_name()
-    MethodCall,    // obj.method()
-    QualifiedCall, // module.function()
+    /// Direct function call: `function_name()`
+    SimpleCall,
+    /// Method call: `obj.method()`
+    MethodCall,
+    /// Qualified call: `module.function()`
+    QualifiedCall,
+    /// Chained attribute call: `obj.attr.method()`
     #[allow(dead_code)]
-    AttributeCall, // obj.attr.method()
-    DynamicCall,   // var_name() where var_name is computed
-    ConstructorCall, // new ClassName() or ClassName()
+    AttributeCall,
+    /// Dynamic/computed call
+    DynamicCall,
+    /// Constructor: `new ClassName()` or `ClassName()`
+    ConstructorCall,
 }
 
 impl FunctionResolver {
